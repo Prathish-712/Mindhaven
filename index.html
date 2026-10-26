@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCare - Mental Wellness Companion</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background overlay -->
+    <div class="background-overlay"></div>
+    
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">🧘‍♀️</span>
+                <div>
+                    <h2>MindCare</h2>
+                    <span class="logo-badge">Fullstack AI</span>
+                </div>
+            </div>
+
+            <!-- User Profile / Auth Widget -->
+            <div class="user-profile-widget" id="user-profile-widget">
+                <div class="user-avatar" id="user-avatar">🧘‍♀️</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Guest Friend</span>
+                    <span class="user-status-tag" id="user-status-tag">Guest Mode</span>
+                </div>
+                <button class="btn-icon" id="btn-auth-toggle" title="Account / Sign In">⚙️</button>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" data-section="chat">
+                    <span class="nav-icon">💭</span>
+                    <span class="nav-text">Chat Support</span>
+                </button>
+                <button class="nav-item" data-section="journal">
+                    <span class="nav-icon">📖</span>
+                    <span class="nav-text">Daily Journal</span>
+                </button>
+                <button class="nav-item" data-section="mood">
+                    <span class="nav-icon">😊</span>
+                    <span class="nav-text">Mood Tracker</span>
+                </button>
+                <button class="nav-item" data-section="exercises">
+                    <span class="nav-icon">🌱</span>
+                    <span class="nav-text">Exercises</span>
+                </button>
+                <button class="nav-item" data-section="emergency">
+                    <span class="nav-icon">🆘</span>
+                    <span class="nav-text">Emergency</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p class="quote" id="sidebar-quote">"One small positive thought can change your whole day."</p>
+                <div class="db-status-badge">
+                    <span class="status-dot online"></span>
+                    <span>Database Synced</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="content-wrapper">
+            <!-- Chat Section -->
+            <section id="chat-section" class="content-section active">
+                <div class="section-header">
+                    <div class="header-titles">
+                        <h1>💭 Empathetic Chat Support</h1>
+                        <p>Share your feelings in a safe, judgment-free, and confidential space</p>
+                    </div>
+                    <button class="btn-secondary btn-sm" id="btn-clear-chat" title="Clear conversation history">
+                        <span>🗑️ Clear Chat</span>
+                    </button>
+                </div>
+                
+                <div class="chat-container">
+                    <div id="chat-messages" class="chat-messages">
+                        <!-- Messages dynamically populated from SQLite DB -->
+                    </div>
+                    
+                    <form class="chat-input-container" id="chat-form" onsubmit="return false;">
+                        <input type="text" id="chat-input" placeholder="Type what's on your mind... (e.g., 'I feel anxious today')" autocomplete="off" />
+                        <button type="submit" id="chat-send" class="send-btn">
+                            <span>Send</span>
+                            <span class="send-icon">→</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+            
+            <!-- Journal Section -->
+            <section id="journal-section" class="content-section">
+                <div class="section-header">
+                    <div class="header-titles">
+                        <h1>📖 Daily Wellness Journal</h1>
+                        <p>Express your feelings, uncover insights, and reflect on gratitude</p>
+                    </div>
+                </div>
+                
+                <div class="journal-container">
+                    <div class="journal-prompts">
+                        <div class="prompt-header">
+                            <h3>💡 Inspiration Prompt</h3>
+                            <button class="btn-secondary btn-sm" id="new-prompt">🎲 New Prompt</button>
+                        </div>
+                        <p class="prompt-text" id="journal-prompt">What made you smile today?</p>
+                    </div>
+                    
+                    <div class="journal-entry">
+                        <div class="entry-meta-row">
+                            <label for="journal-mood-tag">Tag your current mood:</label>
+                            <select id="journal-mood-tag" class="select-input">
+                                <option value="Joyful">😄 Joyful</option>
+                                <option value="Content" selected>😊 Content</option>
+                                <option value="Neutral">😐 Neutral</option>
+                                <option value="Down">😔 Down</option>
+                                <option value="Distressed">😢 Distressed</option>
+                            </select>
+                        </div>
+                        <textarea id="journal-text" placeholder="Start writing your thoughts, feelings, or reflections here..."></textarea>
+                        <div class="journal-actions">
+                            <button class="btn-primary" id="save-journal">💾 Save to Database</button>
+                            <button class="btn-secondary" id="clear-journal">Clear</button>
+                        </div>
+                    </div>
+                    
+                    <div class="journal-history" id="journal-history">
+                        <div class="history-header">
+                            <h3>📚 Your Saved Journal Entries</h3>
+                            <div class="search-box">
+                                <input type="text" id="journal-search" placeholder="🔍 Search entries..." />
+                            </div>
+                        </div>
+                        <div id="journal-list">
+                            <p class="loading-placeholder">Loading your entries from database...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Mood Tracker Section -->
+            <section id="mood-section" class="content-section">
+                <div class="section-header">
+                    <div class="header-titles">
+                        <h1>😊 Mood Tracker & Analytics</h1>
+                        <p>Log your daily emotional landscape and uncover wellbeing patterns</p>
+                    </div>
+                </div>
+                
+                <div class="mood-container">
+                    <div class="mood-selector">
+                        <h3>How are you feeling right now?</h3>
+                        <div class="mood-options">
+                            <button class="mood-option" data-mood="Joyful" data-value="5">
+                                <span class="mood-icon">😄</span>
+                                <span class="mood-label">Joyful</span>
+                                <span class="mood-score-badge">5/5</span>
+                            </button>
+                            <button class="mood-option" data-mood="Content" data-value="4">
+                                <span class="mood-icon">😊</span>
+                                <span class="mood-label">Content</span>
+                                <span class="mood-score-badge">4/5</span>
+                            </button>
+                            <button class="mood-option" data-mood="Neutral" data-value="3">
+                                <span class="mood-icon">😐</span>
+                                <span class="mood-label">Neutral</span>
+                                <span class="mood-score-badge">3/5</span>
+                            </button>
+                            <button class="mood-option" data-mood="Down" data-value="2">
+                                <span class="mood-icon">😔</span>
+                                <span class="mood-label">Down</span>
+                                <span class="mood-score-badge">2/5</span>
+                            </button>
+                            <button class="mood-option" data-mood="Distressed" data-value="1">
+                                <span class="mood-icon">😢</span>
+                                <span class="mood-label">Distressed</span>
+                                <span class="mood-score-badge">1/5</span>
+                            </button>
+                        </div>
+
+                        <div class="mood-note-container">
+                            <input type="text" id="mood-note-input" placeholder="Add an optional note (e.g., 'Finished a big project', 'Felt tired after meeting')..." />
+                        </div>
+                    </div>
+                    
+                    <div class="mood-insights">
+                        <div class="insight-card">
+                            <span class="insight-icon">⭐</span>
+                            <h4>Your Wellbeing Score</h4>
+                            <div class="score-display">
+                                <span class="score-number" id="wellbeing-score">0.0</span>
+                                <span class="score-label">/ 5.0</span>
+                            </div>
+                            <p class="insight-subtext" id="wellbeing-desc">Calculated from your logged check-ins</p>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <span class="insight-icon">📊</span>
+                            <h4>Total Check-ins</h4>
+                            <div class="score-display">
+                                <span class="score-number" id="total-checkins">0</span>
+                                <span class="score-label">times</span>
+                            </div>
+                            <p class="insight-subtext">Persisted in SQLite database</p>
+                        </div>
+
+                        <div class="insight-card">
+                            <span class="insight-icon">🌱</span>
+                            <h4>Mindful Exercises</h4>
+                            <div class="score-display">
+                                <span class="score-number" id="total-exercises-completed">0</span>
+                                <span class="score-label">completed</span>
+                            </div>
+                            <p class="insight-subtext" id="total-exercises-minutes">0 minutes of wellness</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mood-chart" id="mood-chart">
+                        <h3>📈 Recent Mood Timeline</h3>
+                        <div id="mood-timeline">
+                            <p class="loading-placeholder">Loading your mood history...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Exercises Section -->
+            <section id="exercises-section" class="content-section">
+                <div class="section-header">
+                    <div class="header-titles">
+                        <h1>🌱 Guided Wellness Practices</h1>
+                        <p>Evidence-based exercises for nervous system regulation, grounding, and mindfulness</p>
+                    </div>
+                </div>
+                
+                <div class="exercises-grid" id="exercises-grid">
+                    <!-- Loaded dynamically from database catalog -->
+                    <p class="loading-placeholder">Loading wellness practices from database...</p>
+                </div>
+            </section>
+            
+            <!-- Emergency Section -->
+            <section id="emergency-section" class="content-section">
+                <div class="section-header emergency-header">
+                    <div class="header-titles">
+                        <h1>🆘 Emergency & Crisis Support</h1>
+                        <p>Immediate, confidential help is available 24/7. You are never alone.</p>
+                    </div>
+                </div>
+                
+                <div class="emergency-container">
+                    <div class="crisis-alert">
+                        <h2>⚠️ If you are in immediate danger or a medical crisis, call 911 or visit the nearest emergency room.</h2>
+                    </div>
+                    
+                    <!-- Hotlines & Verified Resources Filter -->
+                    <div class="crisis-filter-bar">
+                        <div class="filter-label">🌍 Filter Resources:</div>
+                        <div class="crisis-filter-tabs">
+                            <button class="crisis-filter-btn active" data-filter="all">All Helplines (9)</button>
+                            <button class="crisis-filter-btn" data-filter="us">🇺🇸 US & Canada</button>
+                            <button class="crisis-filter-btn" data-filter="india">🇮🇳 India</button>
+                            <button class="crisis-filter-btn" data-filter="global">🌐 International (130+ Countries)</button>
+                        </div>
+                    </div>
+                    
+                    <div class="crisis-resources" id="crisis-resources-list">
+                        <!-- 988 Suicide & Crisis Lifeline -->
+                        <div class="crisis-card urgent" data-region="us">
+                            <div class="crisis-card-header">
+                                <div class="crisis-icon">📞</div>
+                                <div class="crisis-badges">
+                                    <span class="crisis-badge badge-urgent">24/7 Crisis</span>
+                                    <span class="crisis-region">US & Canada</span>
+                                </div>
+                            </div>
+                            <h3>988 Suicide & Crisis Lifeline</h3>
+                            <a href="tel:988" class="crisis-number">Call or Text 988</a>
+                            <p>24/7 free and confidential support for people in suicidal crisis or emotional distress.</p>
+                            <div class="crisis-website-row">
+                                <span class="verified-tag">Official Website:</span>
+                                <a href="https://988lifeline.org/" target="_blank" rel="noopener noreferrer" class="website-link">988lifeline.org ↗</a>
+                            </div>
+                            <div class="crisis-actions">
+                                <a href="https://988lifeline.org/" target="_blank" rel="noopener noreferrer" class="btn-website">🌐 Official Website ↗</a>
+                                <a href="https://988lifeline.org/chat/" target="_blank" rel="noopener noreferrer" class="btn-chat">💬 Live Web Chat ↗</a>
+                                <a href="tel:988" class="btn-urgent">📞 Call 988</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Crisis Text Line -->
+                        <div class="crisis-card" data-region="us">
+                            <div class="crisis-card-header">
+                                <div class="crisis-icon">💬</div>
+                                <div class="crisis-badges">
+                                    <span class="crisis-badge badge-text">Text & Online</span>
+                                    <span class="crisis-region">US, UK, Canada</span>
+                                </div>
+                            </div>
+                            <h3>Crisis Text Line</h3>
+                            <p class="crisis-number">Text HOME to 741741</p>
+                            <p>Free, 24/7 crisis support via text message with trained crisis counselors.</p>
+                            <div class="crisis-website-row">
+                                <span class="verified-tag">Official Website:</span>
+                                <a href="https://www.crisistextline.org/" target="_blank" rel="noopener noreferrer" class="website-link">crisistextline.org ↗</a>
+                            </div>
+                            <div class="crisis-actions">
+                                <a href="https://www.crisistextline.org/" target="_blank" rel="noopener noreferrer" class="btn-website">🌐 Official Website ↗</a>
+                                <a href="sms:741741?body=HOME" class="btn-secondary">💬 Text 741741</a>
+                            </div>
+                        </div>
+
+                        <!-- Find A Helpline (Global) -->
+                        <div class="crisis-card" data-region="global">
+                            <div class="crisis-card-header">
+                                <div class="crisis-icon">🌍</div>
+                                <div class="crisis-badges">
+                                    <span class="crisis-badge badge-global">Global / 130+ Countries</span>
+                                    <span class="crisis-region">International</span>
+                                </div>
+                            </div>
+                            <h3>Find A Helpline</h3>
+                            <p class="crisis-number">Free & Confidential Worldwide</p>
+                            <p>Free, confidential support from a local crisis center in your country, anywhere worldwide.</p>
+                            <div class="crisis-website-row">
+                                <span class="verified-tag">Official Website:</span>
+                                <a href="https://findahelpline.com/" target="_blank" rel="noopener noreferrer" class="website-link">findahelpline.com ↗</a>
+                            </div>
+                            <div class="crisis-actions">
+                                <a href="https://findahelpline.com/" target="_blank" rel="noopener noreferrer" class="btn-website">🌐 Visit Directory ↗</a>
+                                <a href="https://findahelpline.com/" target="_blank" rel="noopener noreferrer" class="btn-chat">💬 Find Support Near Me ↗</a>
+                            </div>
+                        </div>
+
+                        <!-- SAMHSA Helpline -->
+                        <div class="crisis-card" data-region="us">
+                            <div class="crisis-card-header">
+                                <div class="crisis-icon">🏥</div>
+                                <div class="crisis-badges">
+                                    <span class="crisis-badge badge-info">Referrals</span>
+                                    <span class="crisis-region">United States</span>
+                                </div>
+                            </div>
+                            <h3>SAMHSA National Helpline</h3>
+                            <a href="tel:18006624357" class="crisis-number">1-800-662-4357</a>
+                            <p>Substance abuse and mental health treatment referral and confidential information service.</p>
+                            <div class="crisis-website-row">
+                                <span class="verified-tag">Official Website:</span>
+                                <a href="https://www.samhsa.gov/find-help/national-helpline" target="_blank" rel="noopener noreferrer" class="website-link">samhsa.gov ↗</a>
+                            </div>
+                            <div class="crisis-actions">
+                                <a href="https://www.samhsa.gov/find-help/national-helpline" target="_blank" rel="noopener noreferrer" class="btn-website">🌐 Official Website ↗</a>
+                                <a href="tel:18006624357" class="btn-secondary">📞 Call 1-800-662-4357</a>
+                            </div>
+                        </div>
+
+                        <!-- The Trevor Project -->
+                        <div class="crisis-card" data-region="us">
+                            <div class="crisis-card-header">
+                                <div class="crisis-icon">🌈</div>
+                                <div class="crisis-badges">
+                                    <span class="crisis-badge badge-special">LGBTQ+ Youth</span>
+                                    <span class="crisis-region">US & Global</span>
+                                </div>
+                            </div>
+                            <h3>The Trevor Project</h3>
+                            <a href="tel:18664887386" class="crisis-number">1-866-488-7386</a>
+                            <p>24/7 confidential suicide prevention and crisis intervention for LGBTQ+ young people.</p>
+                            <div class="crisis-website-row">
+                                <span class="verified-tag">Official Website:</span>
+                                <a href="https://www.thetrevorproject.org/" target="_blank" rel="noopener noreferrer" class="website-link">thetrevorproject.org ↗</a>
+                            </div>
+                            <div class="crisis-actions">
+                                <a href="https://www.thetrevorproject.org/" target="_blank" rel="noopener noreferrer" class="btn-website">🌐 Official Website ↗</a>
+                                <a href="https://www.thetrevorproject.org/get-help/" target="_blank" rel="noopener noreferrer" class="btn-chat">💬 Live Web Chat ↗</a>
+                                <a href="tel:18664887386" class="btn-secondary">📞 Call Lifeline</a>
+                            </div>
+                        </div>
+
+                        <!-- Tele-MANAS (India) -->
+                        <div class="crisis-card" data-region="india">
+                            <div class="crisis-card-header">
+                                <div class="crisis-icon">🇮🇳</div>
+                                <div class="crisis-badges">
+                                    <span class="crisis-badge badge-urgent">24/7 India Govt</span>
+                                    <span class="crisis-region">India</span>
+                                </div>
+                            </div>
+                            <h3>Tele-MANAS (Govt of India)</h3>
+                            <a href="tel:14416" class="crisis-number">14416 / 1800-891-4416</a>
+                            <p>Government of India 24/7 mental health helpline providing counseling in 20+ languages.</p>
+                            <div class="crisis-website-row">
+                                <span class="verified-tag">Official Website:</span>
+                                <a href="https://telemanas.mohfw.gov.in/" target="_blank" rel="noopener noreferrer" class="website-link">telemanas.mohfw.gov.in ↗</a>
+                            </div>
+                            <div class="crisis-actions">
+                                <a href="https://telemanas.mohfw.gov.in/" target="_blank" rel="noopener noreferrer" class="btn-website">🌐 Official Portal ↗</a>
+                                <a href="tel:14416" class="btn-urgent">📞 Call 14416</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Trusted Contacts Section -->
+                    <div class="trusted-contacts-box">
+                        <div class="contacts-header">
+                            <h3>🤝 Your Personal Trusted Contacts</h3>
+                            <p>Save trusted friends, family, or your therapist for quick access in moments of need.</p>
+                        </div>
+
+                        <form id="add-contact-form" class="add-contact-form">
+                            <input type="text" id="contact-name" placeholder="Contact Name (e.g., Mom, Dr. Sarah)" required />
+                            <input type="text" id="contact-relation" placeholder="Relationship (e.g., Friend, Therapist)" />
+                            <input type="tel" id="contact-phone" placeholder="Phone Number" required />
+                            <button type="submit" class="btn-primary">➕ Add Contact</button>
+                        </form>
+
+                        <div id="trusted-contacts-list" class="contacts-grid">
+                            <!-- Populated from SQLite DB -->
+                        </div>
+                    </div>
+                    
+                    <div class="immediate-help">
+                        <h3>Need immediate coping strategies right now?</h3>
+                        <div class="quick-tips">
+                            <div class="tip-card">
+                                <h4>🫁 Deep Breathing</h4>
+                                <p>Breathe in slowly for 4 counts, hold for 4, exhale for 4, hold for 4. Repeat.</p>
+                            </div>
+                            <div class="tip-card">
+                                <h4>❄️ Ice Water Shock</h4>
+                                <p>Splash cold water on your face or hold ice cubes to quickly trigger the vagal calming reflex.</p>
+                            </div>
+                            <div class="tip-card">
+                                <h4>🚶 Mindful Movement</h4>
+                                <p>Take a slow 5-minute walk, do gentle shoulder rolls, or stretch to release muscular tension.</p>
+                            </div>
+                            <div class="tip-card">
+                                <h4>☎️ Reach Out</h4>
+                                <p>Send a quick text to a trusted friend or connect with the free counselors on 988.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Exercise Guided Modal with Interactive Timer -->
+    <div id="exercise-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <button class="modal-close" id="close-modal" aria-label="Close modal">×</button>
+            <div id="exercise-content">
+                <!-- Exercise content will be dynamically loaded here -->
+            </div>
+            
+            <div class="exercise-interactive-bar">
+                <div class="timer-box">
+                    <span class="timer-label">Guided Timer:</span>
+                    <span class="timer-display" id="exercise-timer-display">04:00</span>
+                </div>
+                <div class="timer-controls">
+                    <button class="btn-secondary" id="btn-timer-toggle">▶ Start Timer</button>
+                    <button class="btn-primary" id="btn-exercise-complete">🎉 Mark Completed</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Auth Modal (Sign In / Register / Guest Switch) -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content modal-sm">
+            <button class="modal-close" id="close-auth-modal" aria-label="Close modal">×</button>
+            <div class="auth-header">
+                <div class="auth-icon">🧘‍♀️</div>
+                <h2>MindCare Account</h2>
+                <p>Sync your journals, mood history, and settings across sessions</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" data-tab="login">Sign In</button>
+                <button class="auth-tab" id="tab-register" data-tab="register">Create Account</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="form-login" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-username">Username or Email</label>
+                    <input type="text" id="login-username" placeholder="Enter username or email" required />
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required />
+                </div>
+                <button type="submit" class="btn-primary btn-block">Sign In</button>
+                <button type="button" class="btn-secondary btn-block" id="btn-continue-guest">Continue as Guest</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="form-register" class="auth-form">
+                <div class="form-group">
+                    <label for="reg-name">Display Name</label>
+                    <input type="text" id="reg-name" placeholder="How should we call you?" required />
+                </div>
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" placeholder="Choose a username" required />
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" placeholder="name@example.com" required />
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password (min 6 characters)</label>
+                    <input type="password" id="reg-password" placeholder="Create a secure password" minlength="6" required />
+                </div>
+                <button type="submit" class="btn-primary btn-block">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Journal Entry Modal -->
+    <div id="edit-journal-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="close-edit-journal-modal" aria-label="Close modal">×</button>
+            <h2>✏️ Edit Journal Entry</h2>
+            <input type="hidden" id="edit-journal-id" />
+            <div class="form-group" style="margin-top: 16px;">
+                <label for="edit-journal-prompt">Prompt / Title</label>
+                <input type="text" id="edit-journal-prompt" class="select-input" />
+            </div>
+            <div class="form-group">
+                <label for="edit-journal-text">Content</label>
+                <textarea id="edit-journal-text" style="min-height: 180px;"></textarea>
+            </div>
+            <div class="journal-actions">
+                <button class="btn-primary" id="btn-save-edit-journal">Save Changes</button>
+                <button class="btn-secondary" id="btn-cancel-edit-journal">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
